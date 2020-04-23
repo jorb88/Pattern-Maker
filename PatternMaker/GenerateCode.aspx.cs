@@ -52,7 +52,7 @@ namespace PatternMaker
 				enumName = ctrlName.Replace("Controller", string.Empty) + "Op";
 			if (includeAvailabilityProfile)
 			{
-				string enumList = "  public enum " + enumName + " { ";
+				string enumList = "\tpublic enum " + enumName + " { ";
 				for (int i = 0; i < distinctMethods.Count(); i++)
 				{
 					if (i != 0) enumList += ", ";
@@ -60,27 +60,25 @@ namespace PatternMaker
 				}
 				WriteLine(enumList + "  }");
 			}
-			WriteLine("  public partial class " + ctrlName + " : Observable");
-			WriteLine("  {");
-			string encapsulation = "public ";
-			if (controller.UseInnerClasses) encapsulation = "private ";
-			WriteLine("    " + encapsulation + "BaseState state;");
+			WriteLine("\tpublic partial class " + ctrlName + " : Observable");
+			WriteLine("\t{");
+			WriteLine("\t\tprivate BaseState state;");
 			if (includeAvailabilityProfile)
 			{
-				WriteLine("    " + encapsulation + "bool[] ops;");
-				WriteLine("    public bool CanDo(" + enumName + " op) { return ops[(int)op]; }");
+				WriteLine("\t\tprivate bool[] ops;");
+				WriteLine("\t\tpublic bool CanDo(" + enumName + " op) { return ops[(int)op]; }");
 			}
-			WriteLine("    public " + ctrlName + "()");
-			WriteLine("    {");
+			WriteLine("\t\tpublic " + ctrlName + "()");
+			WriteLine("\t\t{");
 			if (includeAvailabilityProfile)
 			{
-				WriteLine("        ops = new bool[Enum.GetValues(typeof(" + enumName + ")).Length];");
+				WriteLine("\t\t\tops = new bool[Enum.GetValues(typeof(" + enumName + ")).Length];");
 			}
-			WriteLine("        state = new " + initialStateName + "(this);");
-			WriteLine("    }");
+			WriteLine("\t\t\tstate = new " + initialStateName + "(this);");
+			WriteLine("\t\t}");
 			if (includeStateTextMessages)
 			{
-				WriteLine("    public string Message {get; set; } ");
+				WriteLine("\t\tpublic string Message {get; set; } = string.Empty;");
 			}
 			foreach (string method in distinctMethods)
 			{
@@ -93,22 +91,23 @@ namespace PatternMaker
 					paramName = string.Empty;
 					paramType = string.Empty;
 				}
-				WriteLine("    public void " + method + "(" + paramType + " " + paramName + ") { " + "state." + method + "(" + paramName + "); Notify(); }");
+				WriteLine("\t\tpublic void " + method + "(" + paramType + " " + paramName + ") { " + "state." + method + "(" + paramName + "); Notify(); }");
 			}
-			if (!controller.UseInnerClasses) WriteLine("    }");
-			WriteLine("    " + encapsulation + "abstract class BaseState");
-			WriteLine("    {");
-			WriteLine("        protected " + ctrlName + " controller;");
-			WriteLine("        protected void Invalid() { throw new InvalidOperationException(); }");
-			WriteLine("        public BaseState(" + ctrlName + " controller)");
-			WriteLine("        {");
-			WriteLine("           this.controller = controller;");
+			WriteLine("\t\t" + "private abstract class BaseState");
+			WriteLine("\t\t{");
+			WriteLine("\t\t\tprotected " + ctrlName + " controller;");
+			WriteLine("\t\t\tprotected void Invalid() { throw new InvalidOperationException(); }");
+			WriteLine("\t\t\tpublic BaseState(" + ctrlName + " controller)");
+			WriteLine("\t\t\t{");
+			WriteLine("\t\t\t\tthis.controller = controller;");
 			if (includeAvailabilityProfile)
 			{
-				WriteLine("           for (int i = 0; i < controller.ops.Length; i++)");
-				WriteLine("               { controller.ops[i] = false; }");
+				WriteLine("\t\t\t\tfor (int i = 0; i < controller.ops.Length; i++)");
+				WriteLine("\t\t\t\t{");
+				WriteLine("\t\t\t\t\tcontroller.ops[i] = false;");
+				WriteLine("\t\t\t\t}");
 			}
-			WriteLine("        }");
+			WriteLine("\t\t\t}");
 
 			foreach (string method in distinctMethods)
 			{
@@ -116,24 +115,24 @@ namespace PatternMaker
 								where p.MethodName.Trim() == method
 								select p.MethodParameter).First() + " p";
 				if (param.Trim().ToLower() == "void p") param = string.Empty;
-				WriteLine("        public virtual void " + method + "(" + param + ") { Invalid(); }");
+				WriteLine("\t\t\tpublic virtual void " + method + "(" + param + ") { Invalid(); }");
 			}
-			WriteLine("    }");
+			WriteLine("\t\t}");
 
 			foreach (string state in distinctStateNames)
 			{
 				var methodsInThisState = from t in controller.StateTransitions
 										 where t.StateName == state
 										 select t.MethodName;
-				WriteLine("    class " + state + " : BaseState");
-				WriteLine("    {");
-				WriteLine("        public " + state + "(" + ctrlName + " controller) : base(controller)");
-				WriteLine("        {");
+				WriteLine("\t\tclass " + state + " : BaseState");
+				WriteLine("\t\t{");
+				WriteLine("\t\t\tpublic " + state + "(" + ctrlName + " controller) : base(controller)");
+				WriteLine("\t\t\t{");
 				if (includeAvailabilityProfile)
 				{
 					foreach (string method in methodsInThisState)
 					{
-						WriteLine("            controller.ops[(int)" + enumName + "." + method + "] = true;");
+						WriteLine("\t\t\t\tcontroller.ops[(int)" + enumName + "." + method + "] = true;");
 					}
 				}
 				if (includeStateTextMessages)
@@ -141,42 +140,42 @@ namespace PatternMaker
 					string message = (from m in controller.StateTransitions
 									  where m.StateName == state
 									  select m.Description).First();
-					WriteLine("            controller.Message = " + "\"" + message + "\";");
+					WriteLine("\t\t\t\tcontroller.Message = " + "\"" + message + "\";");
 				}
-				WriteLine("        }");
+				WriteLine("\t\t\t}");
 				foreach (string method in methodsInThisState)
 				{
 					string param = (from p in controller.StateTransitions
 									where p.MethodName.Trim() == method
 									select p.MethodParameter).First() + " p";
 					if (param.Trim().ToLower() == "void p") param = string.Empty;
-					WriteLine("        public override void " + method + "(" + param + ")");
-					WriteLine("        {");
+					WriteLine("\t\t\tpublic override void " + method + "(" + param + ")");
+					WriteLine("\t\t\t{");
 					var nextState = (from t in controller.StateTransitions
 									 where t.StateName == state && t.MethodName == method
 									 select t.NextState).FirstOrDefault();
 					nextState = nextState.Trim();
 					string partMeth = method + "_" + state + "(" + param + ");";
 					partialMethods.Add(partMeth);
-					if (param.Length > 0) WriteLine("             controller." + method + "_" + state + "(p);");
-					else WriteLine("             controller." + method + "_" + state + "();");
-					WriteLine("        }");
+					if (param.Length > 0) WriteLine("\t\t\t\tcontroller." + method + "_" + state + "(p);");
+					else WriteLine("\t\t\t\tcontroller." + method + "_" + state + "();");
+					WriteLine("\t\t\t}");
 				}
-				WriteLine("    }");
+				WriteLine("\t\t}");
 			}
 			foreach (string pm in partialMethods)
 			{
-				WriteLine("    partial void " + pm);
+				WriteLine("\t\tpartial void " + pm);
 			}
-			if (controller.UseInnerClasses) WriteLine("  }");
-			WriteLine("  public abstract class Observable");
-			WriteLine("  {");
-			WriteLine("      public event EventHandler StateChanged;");
-			WriteLine("      protected void Notify()");
-			WriteLine("      {");
-			WriteLine("          if (StateChanged != null) StateChanged(this,EventArgs.Empty);");
-			WriteLine("      }");
-			WriteLine("  }");
+			WriteLine("\t}");
+			WriteLine("\tpublic abstract class Observable");
+			WriteLine("\t{");
+			WriteLine("\t\tpublic event EventHandler StateChanged;");
+			WriteLine("\t\tprotected void Notify()");
+			WriteLine("\t\t{");
+			WriteLine("\t\t\tif (StateChanged != null) StateChanged(this,EventArgs.Empty);");
+			WriteLine("\t\t}");
+			WriteLine("\t}");
 			WriteLine("}");
 		}
 	}

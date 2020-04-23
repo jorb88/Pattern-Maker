@@ -29,30 +29,30 @@ namespace PatternMaker
 			WriteLine("using " + ctrlr.Namespace + ";");
 			WriteLine("namespace " + ctrlr.Namespace.Trim() + ".Tests");
 			WriteLine("{");
-			WriteLine("    [TestClass]");
-			WriteLine("    public class " + ctrlName + "Tests");
-			WriteLine("    {");
-			WriteLine("        private " + ctrlName + " controller;");
-			WriteLine("        [TestInitialize]");
-			WriteLine("        public void Init() { controller = new " + ctrlName + "(); }");
+			WriteLine("\t[TestClass]");
+			WriteLine("\tpublic class " + ctrlName + "Tests");
+			WriteLine("\t{");
+			WriteLine("\t\tprivate " + ctrlName + " controller;");
+			WriteLine("\t\t[TestInitialize]");
+			WriteLine("\t\tpublic void Init() { controller = new " + ctrlName + "(); }");
 
 			foreach (string stateName in distinctStateNames)
 			{
 				WriteLine(string.Empty);
-				WriteLine("        // Tests for state " + stateName);
+				WriteLine("\t\t// Tests for state " + stateName);
 				foreach (string methodName in distinctMethodNames)
 				{
 					var state = (from st in ctrlr.StateTransitions
 								 where 	((st.StateName == stateName) &&
 										(st.MethodName == methodName))
 								 select st).FirstOrDefault();
-					WriteLine("        [TestMethod]");
-					if (state == null) WriteLine("        [ExpectedException(typeof(InvalidOperationException))]");
-					WriteLine("        public void " + methodName + "_" + stateName + "_Test()");
-					WriteLine("        {");
-					WriteLine("           StepThroughTo_" + stateName + "State();");
-					if (state != null) WriteLine("            Assert.IsTrue(controller.CanDo(" + enumName + "." + methodName + "));");
-					else WriteLine("            Assert.IsFalse(controller.CanDo(" + enumName + "." + methodName + "));");
+					WriteLine("\t\t[TestMethod]");
+					if (state == null) WriteLine("\t\t[ExpectedException(typeof(InvalidOperationException))]");
+					WriteLine("\t\tpublic void " + methodName + "_" + stateName + "_Test()");
+					WriteLine("\t\t{");
+					WriteLine("\t\t\tStepThroughTo_" + stateName + "State();");
+					if (state != null) WriteLine("\t\t\tAssert.IsTrue(controller.CanDo(" + enumName + "." + methodName + "));");
+					else WriteLine("\t\t\tAssert.IsFalse(controller.CanDo(" + enumName + "." + methodName + "));");
 					var type = (from st in ctrlr.StateTransitions
 								where (st.MethodName == methodName)
 								select st).First().MethodParameter;
@@ -71,9 +71,9 @@ namespace PatternMaker
 								if (type == valueType) { argDef = type + " p = 0;"; }
 							}
 						}
-						WriteLine("            " + argDef);
+						WriteLine("\t\t\t" + argDef);
 					}
-					WriteLine("            controller." + methodName + "(" + p + ");");
+					WriteLine("\t\t\tcontroller." + methodName + "(" + p + ");");
 					if (state != null)
 					{
 						var validMethodsInThisNewState = (from st in ctrlr.StateTransitions
@@ -81,27 +81,27 @@ namespace PatternMaker
 														 select st.MethodName).Distinct().ToList();
 						foreach (var vMeth in validMethodsInThisNewState)
 						{
-							WriteLine("            Assert.IsTrue(controller.CanDo(" + enumName + "." + vMeth + "));");
+							WriteLine("\t\t\tAssert.IsTrue(controller.CanDo(" + enumName + "." + vMeth + "));");
 						}
 						var methodsNotValidInThisNewState = distinctMethodNames.Except(validMethodsInThisNewState);
 						foreach (var vMeth in methodsNotValidInThisNewState)
 						{
-							WriteLine("            Assert.IsFalse(controller.CanDo(" + enumName + "." + vMeth + "));");
+							WriteLine("\t\t\tAssert.IsFalse(controller.CanDo(" + enumName + "." + vMeth + "));");
 						}
-						WriteLine("            Assert.Inconclusive(\"Test not fully implemented\");");
+						WriteLine("\t\t\tAssert.Inconclusive(\"Test not fully implemented\");");
 					}
-					WriteLine("        }");
+					WriteLine("\t\t}");
 				}
 			}
 			foreach (string stateName in distinctStateNames)
 			{
-				WriteLine("        private void StepThroughTo_" + stateName + "State()");
-				WriteLine("        {");
-				WriteLine("            // Add steps here to move controller to appropriate state");
-				WriteLine("            // throw new Exception(\"Not implemented\");");
-				WriteLine("        }");
+				WriteLine("\t\tprivate void StepThroughTo_" + stateName + "State()");
+				WriteLine("\t\t{");
+				WriteLine("\t\t\t// Add steps here to move controller to appropriate state");
+				WriteLine("\t\t\t// throw new Exception(\"Not implemented\");");
+				WriteLine("\t\t}");
 			}
-			WriteLine("    }");
+			WriteLine("\t}");
 			WriteLine("}");
 
 		}

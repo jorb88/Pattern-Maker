@@ -19,7 +19,6 @@ namespace PatternMaker
 				txtNamespace.Text = controller.Namespace;
 				cbIncludeMethodAvailability.Checked = controller.IncludeAvailabilityProfile;
 				cbIncludeMessages.Checked = controller.IncludeMessageText;
-				cbUseInnerClasses.Checked = controller.UseInnerClasses;
 				SetHintText();
 				lblMessage.Text = string.Empty;
 			}
@@ -67,7 +66,6 @@ namespace PatternMaker
 				controller.Namespace = txtNamespace.Text;
 				controller.IncludeMessageText = cbIncludeMessages.Checked;
 				controller.IncludeAvailabilityProfile = cbIncludeMethodAvailability.Checked;
-				controller.UseInnerClasses = cbUseInnerClasses.Checked;
 				repository.SaveChanges();
 				lblMessage.Text = "Data Saved";
 			}
@@ -76,11 +74,11 @@ namespace PatternMaker
 		{
 			StateTransition st = new StateTransition()
 			{
-				Description = "[EDIT]",
-				MethodName = "[EDIT]",
+				Description = "",
+				MethodName = "",
 				MethodParameter = "void",
-				NextState = "[EDIT]",
-				StateName = "[EDIT]",
+				NextState = "",
+				StateName = "",
 				ControllerID = controller.Id
 			};
 			controller.StateTransitions.Add(st);

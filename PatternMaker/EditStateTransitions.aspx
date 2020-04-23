@@ -1,6 +1,6 @@
 ﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="EditStateTransitions.aspx.cs" Inherits="PatternMaker.EditStateTransitions" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
-    <asp:EntityDataSource ID="EntityDataSource1" runat="server" ConnectionString="name=PatternEntities" DefaultContainerName="PatternEntities" EnableDelete="True" EnableFlattening="False" EnableInsert="True" EnableUpdate="True" EntitySetName="StateTransitions" OnQueryCreated="EntityDataSource1_QueryCreated">
+	<asp:EntityDataSource ID="EntityDataSource1" runat="server" ConnectionString="name=PatternEntities" DefaultContainerName="PatternEntities" EnableDelete="True" EnableFlattening="False" EnableInsert="True" EnableUpdate="True" EntitySetName="StateTransitions" OnQueryCreated="EntityDataSource1_QueryCreated">
     </asp:EntityDataSource>
     <asp:UpdatePanel ID="UpdatePanel1" runat="server">
         <ContentTemplate>
@@ -21,7 +21,7 @@
                 <tr>
                     <td>&nbsp;</td>
                     <td><asp:Button ID="btnSave" runat="server" OnClick="btnSave_Click" Text="Save" /></td>
-                    <td><asp:CheckBox ID="cbUseInnerClasses" runat="server" Text="Generate controller code using inner classes" /></td>
+                    <td>&nbsp;</td>
                 </tr>
                 
                 <tr>
