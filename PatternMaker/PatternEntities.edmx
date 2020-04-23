@@ -1,0 +1,216 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="PatternModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="ControllerNames">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="IncludeMessageText" Type="bit" Nullable="false" />
+          <Property Name="IncludeAvailabilityProfile" Type="bit" Nullable="false" />
+          <Property Name="Namespace" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="UserEmail" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="UseInnerClasses" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="ControllerUsers">
+          <Key>
+            <PropertyRef Name="EmailAddress" />
+          </Key>
+          <Property Name="EmailAddress" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="Password" Type="varchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="StateTransitionTable">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="StateName" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="MethodName" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="MethodParameter" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="Description" Type="varchar" MaxLength="256" Nullable="false" />
+          <Property Name="NextState" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="ControllerID" Type="int" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_ControllerNames_ControllerUsers">
+          <End Role="ControllerUsers" Type="Self.ControllerUsers" Multiplicity="1" />
+          <End Role="ControllerNames" Type="Self.ControllerNames" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ControllerUsers">
+              <PropertyRef Name="EmailAddress" />
+            </Principal>
+            <Dependent Role="ControllerNames">
+              <PropertyRef Name="UserEmail" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_StateTransitions_Controllers">
+          <End Role="ControllerNames" Type="Self.ControllerNames" Multiplicity="1" />
+          <End Role="StateTransitionTable" Type="Self.StateTransitionTable" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ControllerNames">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="StateTransitionTable">
+              <PropertyRef Name="ControllerID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="PatternModelStoreContainer">
+          <EntitySet Name="ControllerNames" EntityType="Self.ControllerNames" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ControllerUsers" EntityType="Self.ControllerUsers" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="StateTransitionTable" EntityType="Self.StateTransitionTable" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_ControllerNames_ControllerUsers" Association="Self.FK_ControllerNames_ControllerUsers">
+            <End Role="ControllerUsers" EntitySet="ControllerUsers" />
+            <End Role="ControllerNames" EntitySet="ControllerNames" />
+          </AssociationSet>
+          <AssociationSet Name="FK_StateTransitions_Controllers" Association="Self.FK_StateTransitions_Controllers">
+            <End Role="ControllerNames" EntitySet="ControllerNames" />
+            <End Role="StateTransitionTable" EntitySet="StateTransitionTable" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="PatternModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="ControllerName">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="IncludeMessageText" Type="Boolean" Nullable="false" />
+          <Property Name="IncludeAvailabilityProfile" Type="Boolean" Nullable="false" />
+          <Property Name="Namespace" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="UserEmail" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="UseInnerClasses" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="ControllerUser" Relationship="Self.FK_ControllerNames_ControllerUsers" FromRole="ControllerNames" ToRole="ControllerUsers" />
+          <NavigationProperty Name="StateTransitions" Relationship="Self.FK_StateTransitions_Controllers" FromRole="ControllerNames" ToRole="StateTransitionTable" />
+        </EntityType>
+        <EntityType Name="ControllerUser">
+          <Key>
+            <PropertyRef Name="EmailAddress" />
+          </Key>
+          <Property Name="EmailAddress" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Password" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <NavigationProperty Name="ControllerNames" Relationship="Self.FK_ControllerNames_ControllerUsers" FromRole="ControllerUsers" ToRole="ControllerNames" />
+        </EntityType>
+        <EntityType Name="StateTransition">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="StateName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="MethodName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="MethodParameter" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Description" Type="String" MaxLength="256" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="NextState" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="ControllerID" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="ControllerName" Relationship="Self.FK_StateTransitions_Controllers" FromRole="StateTransitionTable" ToRole="ControllerNames" />
+        </EntityType>
+        <Association Name="FK_ControllerNames_ControllerUsers">
+          <End Role="ControllerUsers" Type="Self.ControllerUser" Multiplicity="1" />
+          <End Role="ControllerNames" Type="Self.ControllerName" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ControllerUsers">
+              <PropertyRef Name="EmailAddress" />
+            </Principal>
+            <Dependent Role="ControllerNames">
+              <PropertyRef Name="UserEmail" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_StateTransitions_Controllers">
+          <End Role="ControllerNames" Type="Self.ControllerName" Multiplicity="1" />
+          <End Role="StateTransitionTable" Type="PatternModel.StateTransition" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ControllerNames">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="StateTransitionTable">
+              <PropertyRef Name="ControllerID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="PatternEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="ControllerNames" EntityType="Self.ControllerName" />
+          <EntitySet Name="ControllerUsers" EntityType="Self.ControllerUser" />
+          <EntitySet Name="StateTransitions" EntityType="PatternModel.StateTransition" />
+          <AssociationSet Name="FK_ControllerNames_ControllerUsers" Association="Self.FK_ControllerNames_ControllerUsers">
+            <End Role="ControllerUsers" EntitySet="ControllerUsers" />
+            <End Role="ControllerNames" EntitySet="ControllerNames" />
+          </AssociationSet>
+          <AssociationSet Name="FK_StateTransitions_Controllers" Association="Self.FK_StateTransitions_Controllers">
+            <End Role="ControllerNames" EntitySet="ControllerNames" />
+            <End Role="StateTransitionTable" EntitySet="StateTransitions" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="PatternModelStoreContainer" CdmEntityContainer="PatternEntities">
+          <EntitySetMapping Name="ControllerNames">
+            <EntityTypeMapping TypeName="PatternModel.ControllerName">
+              <MappingFragment StoreEntitySet="ControllerNames">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="IncludeMessageText" ColumnName="IncludeMessageText" />
+                <ScalarProperty Name="IncludeAvailabilityProfile" ColumnName="IncludeAvailabilityProfile" />
+                <ScalarProperty Name="Namespace" ColumnName="Namespace" />
+                <ScalarProperty Name="UserEmail" ColumnName="UserEmail" />
+                <ScalarProperty Name="UseInnerClasses" ColumnName="UseInnerClasses" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ControllerUsers">
+            <EntityTypeMapping TypeName="PatternModel.ControllerUser">
+              <MappingFragment StoreEntitySet="ControllerUsers">
+                <ScalarProperty Name="EmailAddress" ColumnName="EmailAddress" />
+                <ScalarProperty Name="Password" ColumnName="Password" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="StateTransitions">
+            <EntityTypeMapping TypeName="PatternModel.StateTransition">
+              <MappingFragment StoreEntitySet="StateTransitionTable">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="StateName" ColumnName="StateName" />
+                <ScalarProperty Name="MethodName" ColumnName="MethodName" />
+                <ScalarProperty Name="MethodParameter" ColumnName="MethodParameter" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="NextState" ColumnName="NextState" />
+                <ScalarProperty Name="ControllerID" ColumnName="ControllerID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="true" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
