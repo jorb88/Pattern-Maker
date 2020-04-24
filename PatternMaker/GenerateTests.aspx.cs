@@ -36,11 +36,10 @@ namespace PatternMaker
 			WriteLine("\t\t[TestInitialize]");
 			WriteLine("\t\tpublic void Init() { controller = new " + ctrlName + "(); }");
 
-			foreach (string stateName in distinctStateNames)
+			foreach (string methodName in distinctMethodNames.OrderBy(mn => mn))
 			{
 				WriteLine(string.Empty);
-				WriteLine("\t\t// Tests for state " + stateName);
-				foreach (string methodName in distinctMethodNames)
+				foreach (string stateName in distinctStateNames.OrderBy(dn => dn))
 				{
 					var state = (from st in ctrlr.StateTransitions
 								 where 	((st.StateName == stateName) &&
@@ -93,7 +92,7 @@ namespace PatternMaker
 					WriteLine("\t\t}");
 				}
 			}
-			foreach (string stateName in distinctStateNames)
+			foreach (string stateName in distinctStateNames.OrderBy(dn => dn))
 			{
 				WriteLine("\t\tprivate void StepThroughTo_" + stateName + "State()");
 				WriteLine("\t\t{");

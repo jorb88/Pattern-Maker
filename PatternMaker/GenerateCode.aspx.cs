@@ -163,6 +163,7 @@ namespace PatternMaker
 				}
 				WriteLine("\t\t}");
 			}
+			partialMethods.Sort();
 			foreach (string pm in partialMethods)
 			{
 				WriteLine("\t\tpartial void " + pm);
@@ -177,6 +178,28 @@ namespace PatternMaker
 			WriteLine("\t\t}");
 			WriteLine("\t}");
 			WriteLine("}");
+
+			WriteLine("//==========================================================================");
+			WriteLine("//Copy this code into a separate file named " + ctrlName + "Methods.cs" + Environment.NewLine +
+				"//Complete these partial methods as needed. You should not need to edit within" + Environment.NewLine +
+				"//the state pattern logic directly.");
+			WriteLine("//==========================================================================" + Environment.NewLine);
+
+			WriteLine("//using System;");
+			WriteLine("//namespace " + controller.Namespace.Trim());
+			WriteLine("//{");
+			WriteLine("//\tpublic partial class " + ctrlName);
+			WriteLine("//\t{");
+			foreach (string pmeth in partialMethods)
+			{
+				string pstr = pmeth.Trim();
+				if (pstr.EndsWith(";")) pstr = pstr.Substring(0, pmeth.Length - 1);
+				WriteLine("//\t\tpartial void " + pstr);
+				WriteLine("//\t\t{");
+				WriteLine("//\t\t}");
+			}
+			WriteLine("//\t}");
+			WriteLine("//}");
 		}
 	}
 }
